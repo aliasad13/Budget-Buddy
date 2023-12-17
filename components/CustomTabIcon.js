@@ -11,7 +11,7 @@ const CustomTabIcon = ({ focused, icon }) => {
 
     return (
         <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            {React.cloneElement(icon, {
+            {React.cloneElement(icon, {   // Cloning the provided icon element using React.cloneElement. This allows us to add or override properties of the cloned element.
                 size: focused ? 30 : 20,
                 color: focused ? '#9fd533' : 'white',
             })}

@@ -1,9 +1,16 @@
-import React from 'react';
-import {StyleSheet, Text} from "react-native";
+import React, {useEffect, useState} from 'react';
+import {FlatList, StyleSheet, Text, View} from "react-native";
+import {fetchExpenses} from "../util/http";
+import ExpensesList from "../components/ExpensesOutput/ExpensesList";
 
 function AllExpenses() {
-     return <Text>This my All Expenses screen</Text>
+  return(
+      <ExpensesList/>
+  )
+
 }
+
+
 
 export default AllExpenses;
 
@@ -11,7 +18,7 @@ export default AllExpenses;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#131313',
         alignItems: 'center',
         justifyContent: 'center',
     },

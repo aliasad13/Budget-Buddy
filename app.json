@@ -11,6 +11,12 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "packagerOpts": {
+      "hostType": "lan",
+      "lanType": "ip",
+      "lanIp": "192.168.20.3",
+      "lanPort": 8081
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
