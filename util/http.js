@@ -2,10 +2,23 @@ import axios from 'axios' ;
 
 const BACKEND_URL = 'http://192.168.20.3:3000/'
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//POST
+
 function storeExpense(expenseData) {
     axios.post(BACKEND_URL + 'api/v1/expenses', expenseData);
 
 }
+
+export function deleteExpense(expenseId) {
+    return axios.delete(BACKEND_URL + `api/v1/expenses/${expenseId}`);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//GET
 
 export async function fetchExpenses() {
     try {

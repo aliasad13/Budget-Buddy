@@ -128,7 +128,7 @@ export default function App() {
             headerStyle: {backgroundColor: 'black'},
             headerShown: true,
             headerTintColor: "white",
-            contentStyle: {backgroundColor: "#361869"},
+            contentStyle: {backgroundColor: "#1e1e1e"},
             presentation: "modal",
         }}
     />

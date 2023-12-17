@@ -1,9 +1,35 @@
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 import ExpenseItem from './ExpenseItem';
 import {useEffect, useState} from "react";
-import {fetchExpenses} from "../../util/http";
+import {deleteExpense, fetchExpenses} from "../../util/http";
+import {SwipeListView} from "react-native-swipe-list-view";
+import AntDesign from "react-native-vector-icons/AntDesign";
 // import WebSocketService from "../../util/WebSocketService";
+
+
+function showConfirmation(id,description) {
+    console.log("name",description)
+    Alert.alert(
+        'Delete Item',
+        `${description}?`,
+        [
+            {
+                text: 'Cancel',
+                style: 'cancel',
+            },
+            {
+                text: 'OK',
+                onPress: () => {
+                    deleteExpense(id)
+                        .then(() => console.log(id, 'deleted successfully'))
+                        .catch(error => console.error('Error deleting expense:', error));
+                },
+            },
+        ],
+        {cancelable: false}
+    );
+}
 
 function renderExpenseItem(itemData) {
     return <ExpenseItem
@@ -11,10 +37,18 @@ function renderExpenseItem(itemData) {
         amount={itemData.item.amount}
         date={itemData.item.date}
         id={itemData.item.id}
-
-
     />;
 }
+
+
+
+const renderHiddenItem = (rowdata, rowMap) => (
+    <View style={{ flex: 1, justifyContent: 'flex-end', flexDirection: 'row', zIndex: 0}}>
+        <TouchableOpacity onPress={() => showConfirmation(rowdata.item.id, rowdata.item.description)} style={[styles.expenseItem,{marginRight:15 }]}>
+            <Text style={{ color: 'white' }}><AntDesign name="delete" size={24} color="red" /></Text>
+        </TouchableOpacity>
+    </View>
+);
 
 function ExpensesList() {
 
@@ -41,15 +75,17 @@ function ExpensesList() {
     console.log("expenses: " + JSON.stringify(expenses, null, 2))
 
     return (
-        <View style={{backgroundColor: "#171717"}}>
-            <FlatList
+        <View style={{backgroundColor: "#171717", zIndex: 10}}>
+            <SwipeListView
                 data={expenses}
-                keyExtractor={(item) => item.id}
-                renderItem={renderExpenseItem}
-                contentContainerStyle={styles.scrollView}
+                keyExtractor={(item) => item.id.toString()}
+                renderHiddenItem={renderHiddenItem}
+                rightOpenValue={-75}
                 ItemSeparatorComponent={<View style={styles.separator}/> } // we can use itemSeparator to separate the items of the list with any style rather than just space
-                ListEmptyComponent={<Text style={styles.listViewNoItem}>No items found</Text>}
-
+                ListEmptyComponent={<Text style={styles.listViewNoItem}>Trying To Fetch Data</Text>}
+                renderItem={renderExpenseItem}
+                leftOpenValue={75}
+                disableRightSwipe={true}
             />
         </View>
     );
@@ -67,6 +103,18 @@ const styles = StyleSheet.create({
 
     gridItem: {
         margin: 16,
+    },
+    expenseItem: {
+        paddingHorizontal: 15,
+        marginVertical: 8,
+        backgroundColor: "#171717",
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderRadius: 6,
+        elevation: 3,
+        alignItems: "center"
+
+
     },
 
     scrollView: {

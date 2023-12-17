@@ -1,4 +1,4 @@
-import {FlatList, TouchableOpacity, View, StyleSheet, Text} from "react-native";
+import {FlatList, TouchableOpacity, View, StyleSheet, Text, Pressable} from "react-native";
 import {useNavigation} from "@react-navigation/native";
 
 
@@ -15,8 +15,9 @@ function ExpenseItem({ description, amount, date, id }) {
     }
 
     return (
-        <TouchableOpacity
+        <Pressable
             onPress={expensePressHandler}
+            style={({ pressed }) => pressed && styles.pressed}
         >
             <View style={styles.expenseItem}>
                 <View>
@@ -29,7 +30,7 @@ function ExpenseItem({ description, amount, date, id }) {
                     <Text style={styles.amount}>{amount.toFixed(2)}</Text>
                 </View>
             </View>
-        </TouchableOpacity>
+        </Pressable>
     );
 }
 
@@ -37,20 +38,19 @@ export default ExpenseItem;
 
 const styles = StyleSheet.create({
     pressed: {
-        opacity: 0.75,
+        backgroundColor: "#262626",
+        borderRadius: 5
     },
+
     expenseItem: {
         padding: 12,
         marginVertical: 8,
-        backgroundColor: GlobalStyles.colors.primary500,
+        backgroundColor: "#171717",
         flexDirection: 'row',
         justifyContent: 'space-between',
         borderRadius: 6,
         elevation: 3,
-        shadowColor: GlobalStyles.colors.gray500,
-        shadowRadius: 4,
-        shadowOffset: { width: 1, height: 1 },
-        shadowOpacity: 0.4,
+
     },
     textBase: {
         color: GlobalStyles.colors.primary50,

@@ -52,9 +52,9 @@ Rails.application.configure do
 
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
-  # config.action_cable.mount_path = '/cable'
-  # config.action_cable.url = "/cable"
-  # config.action_cable.allowed_request_origins = ['http://192.168.20.3:3000']
+  config.action_cable.mount_path = '/cable'
+  config.action_cable.url = "/cable"
+  config.action_cable.allowed_request_origins = ['http://192.168.20.3:3000']
 
 
   # Raises error for missing translations.
