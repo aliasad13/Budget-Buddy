@@ -1,10 +1,11 @@
-import {Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 import ExpenseItem from './ExpenseItem';
 import {useEffect, useState} from "react";
 import {deleteExpense, fetchExpenses} from "../../util/http";
 import {SwipeListView} from "react-native-swipe-list-view";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import WebSocketService from "../../util/WebSocketService";
 // import WebSocketService from "../../util/WebSocketService";
 
 
@@ -55,10 +56,10 @@ function ExpensesList() {
 
     const [expenses, setExpenses] = useState()
     useEffect(() => {
-        // WebSocketService.on('notifications', (data) => {
-        //     console.log('Received WebSocket notification:', data);
-        //     // Update your component state or trigger a refresh
-        // });
+        WebSocketService.on('notifications', (data) => {
+            console.log('Received WebSocket notification:', data);
+            // Update your component state or trigger a refresh
+        });
         async function getExpenses() {
             try {
                 const response = await fetchExpenses();
@@ -75,17 +76,18 @@ function ExpensesList() {
     console.log("expenses: " + JSON.stringify(expenses, null, 2))
 
     return (
-        <View style={{backgroundColor: "#171717", zIndex: 10}}>
+        <View style={{backgroundColor: "#171717", zIndex: 10, flex: 1, paddingBottom: 85}}>
             <SwipeListView
                 data={expenses}
                 keyExtractor={(item) => item.id.toString()}
                 renderHiddenItem={renderHiddenItem}
                 rightOpenValue={-75}
                 ItemSeparatorComponent={<View style={styles.separator}/> } // we can use itemSeparator to separate the items of the list with any style rather than just space
-                ListEmptyComponent={<Text style={styles.listViewNoItem}>Trying To Fetch Data</Text>}
+                ListEmptyComponent={<View style={{top: 40}}><ActivityIndicator size={"large"} color={"red"} ></ActivityIndicator></View>}
                 renderItem={renderExpenseItem}
                 leftOpenValue={75}
                 disableRightSwipe={true}
+
             />
         </View>
     );

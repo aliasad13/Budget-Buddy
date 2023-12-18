@@ -5,7 +5,7 @@ module Api
       before_action :set_expense, only: [:show, :update, :destroy]
 
       def index
-        @expenses = Expense.all
+        @expenses = Expense.order(date: :asc)
         render json: @expenses
       end
 

@@ -1,8 +1,9 @@
 import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {Button, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 // import {useRoute} from "@react-navigation/native";
-import {fetchExpenses} from "../util/http";
+import {fetchExpenses, fetchExpense, storeExpense, updateExpense} from "../util/http";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker from "../util/datePicker";
 
 
 
@@ -16,45 +17,21 @@ function ManageExpense({route, navigation}) {
     console.log("expenseId:", expenseId)
     const isEditable = !!expenseId       //If expenseId is truthy (i.e., it has a value other than undefined, null, 0, false, NaN, or an empty string),
                                             // then the first ! will turn it into false, and the second ! will turn that false back into true.
-    console.log("isEditable:", isEditable)
 
 
-
-
-
-   //date picker
-    const [date, setDate] = useState(new Date());
-    const [mode, setMode] = useState('date')
-    const [show, setShow] = useState(false)
-    const [text, setText] = useState('Empty')
-
-    const onDateChange = (event, selectedDate) =>{
-            const currentDate = selectedDate || date;
-            setShow(Platform.OS === "ios");
-            setDate(currentDate)
-
-        let tempDate = new Date(currentDate);
-        let formattedDate = tempDate.getDate() + '/' + (tempDate.getMonth() + 1) + '/' + tempDate.getFullYear()
-        let formattedTime = 'H:' + tempDate.getHours() + "M:" + tempDate.getMinutes() + 'S:' + tempDate.getHours()
-        setText(formattedDate + '\n' + formattedTime)
-        console.log(formattedDate + '\n' + formattedTime)
-
-    }
-
-    const showMode = (currentMode) => {
-        setShow(true)
-        setMode(currentMode);
-    }
-
-
-
-    const [expenses, setExpenses] = useState([]);
-    const expense = expenses.find((expense) => expense.id === expenseId)
-
-    const toggleDatePicker = () => {
-        setShowPicker(!setShowPicker);
+    // const [expenses, setExpenses] = useState([]);
+    const [fetchedExpense, setFetchedExpense] = useState('');
+    const [description, setDescription] = useState('');
+    const [amount, setAmount] = useState('');
+    const [formattedDate, setFormattedDate] = useState(new Date());
+    // const expense = expenses.find((expense) => expense.id === expenseId)
+    console.log("description:", description)
+    console.log("amount:", amount)
+    console.log("formattedDate:", formattedDate)
+    const handleDateChange = (date) => {
+        // This function is called from DatePicker, and it receives the formatted date
+        setFormattedDate(date);
     };
-
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -65,46 +42,100 @@ function ManageExpense({route, navigation}) {
 
 
     useEffect(() => {
-        async function getExpenses() {
-            try {
-                const response = await fetchExpenses();
-                setExpenses(response); // Assuming that the response is an array of expenses
-            } catch (error) {
-                console.error('Error fetching expenses:', error);
+
+        async function getSingleExpense() {
+            if (isEditable && expenseId) {
+                try {
+                    const response = await fetchExpense(expenseId);
+                    const singleExpense = response; // Assuming you are fetching a single expense
+                    setFetchedExpense(singleExpense);
+                    console.log("response:", response)
+
+                    setDescription(singleExpense.description || '');
+                    setAmount(singleExpense.amount || '');
+                    setFormattedDate(new Date(singleExpense.date) || new Date());
+                } catch (error) {
+                    console.error('Error fetching single expense:', error);
+                }
             }
         }
-        getExpenses();
-    }, []);
+        getSingleExpense();
+    }, [expenseId, isEditable]);
 
 
-    console.log("expense: " + JSON.stringify(expense, null, 2))
+
+    const expenseData = {
+        description,
+        amount,
+        date: formattedDate.toISOString()
+    };
+
+    function submitHandlerStore( expenseData){
+
+            if (!expenseData.description) {
+                alert('Description is empty !!')
+            } else if (!expenseData.amount) {
+                alert('Amount is empty !!')
+            } else if (expenseData.amount && expenseData.description) {
+                console.log('expenseData:', expenseData);
+                storeExpense(expenseData)
+                //try calling fetchExpenses
+            }
+    }
+    function submitHandlerUpdate(expenseId, expenseData){
+
+        console.log("expenseDataaaaaaaaaaaaaaaaaaaaaa", expenseData)
+        if (!expenseData.description) {
+            alert('Description is empty !!')
+        } else if (!expenseData.amount) {
+            alert('Amount is empty !!')
+        } else if (expenseData.amount && expenseData.description) {
+            console.log('expenseData:', expenseData);
+            updateExpense(expenseId, expenseData)
+        }
+
+
+    }
+
+
 
     return(
         <View>
-            {isEditable && (
+            {!isEditable && (
                 <View style={styles.inputView}>
-                    <TextInput style={styles.textInput} placeholder={"Description"}/>
-                    <TextInput style={styles.textInput} placeholder={"Amount"}/>
+                    <TextInput style={styles.textInput} placeholder={"Description"} onChangeText={ text => setDescription(text)} />
+                    <TextInput style={styles.textInput} placeholder={"Amount"} onChangeText={ text => setAmount(text) } keyboardType={"number-pad"}/>
+                    <View style={{marginVertical: 40}}>
+                    <DatePicker onDateChange={handleDateChange} initialDate={formattedDate}/>
+                    </View>
+                    <View style={styles.submitButtonContainer}>
+                        <TouchableOpacity style={styles.submitButton} onPress={() => {
+                            submitHandlerStore(expenseData)
+                        }}>
+                            <Text style={{color: "white"}}>
+                                Submit
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )}
 
-                    <TouchableOpacity style={styles.dateButton} onPress={() => showMode('date')}>
-                        <Text>Pick Date</Text>
-                    </TouchableOpacity>
-
-
-                    {/*<TouchableOpacity style={styles.dateButton} onPress={() => showMode('time')}>*/}
-                    {/*    <Text>Pick Time</Text>*/}
-                    {/*</TouchableOpacity>*/}
-
-                    {show && (
-                        <DateTimePicker
-                            testID='dateTimePicker'
-                            value={date}
-                            mode={mode}
-                            is24Hour={true}
-                            display="default"
-                            onChange={onDateChange}
-                        />
-                    )}
+            {isEditable &&(
+                <View style={styles.inputView}>
+                    <TextInput style={styles.textInput} placeholder={"Description"}  value={description} onChangeText={ text => setDescription(text)} />
+                    <TextInput style={styles.textInput} placeholder={"Amount"}  value={amount.toString()} onChangeText={ text => setAmount(text) } keyboardType={"number-pad"}/>
+                    <View style={{marginVertical: 40}}>
+                        <DatePicker onDateChange={handleDateChange} initialDate={formattedDate}/>
+                    </View>
+                    <View style={styles.submitButtonContainer}>
+                        <TouchableOpacity style={styles.submitButton} onPress={() => {
+                            submitHandlerUpdate(expenseId, expenseData)
+                        }}>
+                            <Text style={{color: "white"}}>
+                                Submit
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             )}
         </View>
@@ -132,12 +163,26 @@ const styles = StyleSheet.create({
         flexWrap: "wrap"
     },
 
+    submitButton: {
+        color: "white",
+        height: 20,
+        width: 70,
+        alignItems: "center",
+        justifyContent: "center"
+    },
+
+    submitButtonContainer: {
+        alignItems: "center",
+        justifyContent: "center",
+        marginVertical: 20
+    },
+
     textInput: {
         height: 35,
         width: 150,
         borderWidth: .75,
         color: "white",
-        backgroundColor: "white",
+        backgroundColor: "#696666",
         borderRadius: 6,
         paddingHorizontal: 10,
         margin: 15

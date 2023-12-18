@@ -3,20 +3,62 @@ import axios from 'axios' ;
 const BACKEND_URL = 'http://192.168.20.3:3000/'
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //POST
 
-function storeExpense(expenseData) {
-    axios.post(BACKEND_URL + 'api/v1/expenses', expenseData);
+export function storeExpense(expenseData) {
+    axios.post(BACKEND_URL + 'api/v1/expenses', expenseData)
+        .then(response => {
+            // Handle success, e.g., show a message to the user
+            console.log('Expense stored successfully:', response.data);
+            alert('Food has been added successfully')
+        })
+        .catch(error => {
+            // Handle error, e.g., show an error message to the user
+            console.error('Error storing expense:', error);
+            alert('Error storing food')
+
+        });
 
 }
+
+// PUT
+
+export function updateExpense(expenseId, expenseData) {
+    axios.put(BACKEND_URL + `api/v1/expenses/${expenseId}`, expenseData)
+        .then(response => {
+            // Handle success, e.g., show a message to the user
+            console.log('Expense stored successfully:', response.data);
+            alert('Food has been updated successfully')
+        })
+        .catch(error => {
+            // Handle error, e.g., show an error message to the user
+            console.error('Error storing expense:', error);
+            alert('Error updating food')
+
+        });
+
+}
+
+
+// DELETE
 
 export function deleteExpense(expenseId) {
-    return axios.delete(BACKEND_URL + `api/v1/expenses/${expenseId}`);
+    return axios.delete(BACKEND_URL + `api/v1/expenses/${expenseId}`)
+        .then(response => {
+            // Handle success, e.g., show a message to the user
+            console.log('Expense stored successfully:', response.data);
+            alert('Food has been deleted successfully')
+        })
+        .catch(error => {
+            // Handle error, e.g., show an error message to the user
+            console.error('Error deleting food:', error);
+            alert('Error deleting food')
+        });
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 //GET
 
@@ -40,6 +82,36 @@ export async function fetchExpenses() {
 
     } catch (error) {
         console.log("error: " + JSON.stringify(error.data, null, 2))
+    }
+}
+
+export async function fetchExpense(expenseId) {
+    try {
+        const response = await axios.get(BACKEND_URL + `api/v1/expenses/${expenseId}`);
+        const expenseData = response.data;
+
+        if (Array.isArray(expenseData)) {
+            // If the response is an array, assume it's a list of expenses
+            const expenses = expenseData.map((expenseItem) => ({
+                id: expenseItem.id,
+                amount: expenseItem.amount,
+                date: expenseItem.date,
+                description: expenseItem.description,
+            }));
+            return expenses;
+        } else {
+            // If the response is a single expense object
+            const expense = {
+                id: expenseData.id,
+                amount: expenseData.amount,
+                date: expenseData.date,
+                description: expenseData.description,
+            };
+            return expense; // Return a single-element array for consistency
+        }
+    } catch (error) {
+        console.error('Error fetching expense:', error);
+        return []; // Return an empty array in case of an error
     }
 }
 
