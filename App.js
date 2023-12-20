@@ -16,6 +16,7 @@ import {GlobalStyles} from "./constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import React from "react";
 import IconButtons from "./components/IconButton";
+import ExpensesContextProvider from "./store/expenses-context";
 
 
 const Stack = createNativeStackNavigator();
@@ -91,54 +92,57 @@ function ExpensesOverview(){
 
 export default function App() {
   return (
-<NavigationContainer>
-  <Stack.Navigator
-      screenOptions={{
-          headerShown: false,
-      contentStyle: {backgroundColor: "black"}}}>
 
-      <Stack.Screen
-          name={"ExpensesOverview"}
-          component={ExpensesOverview}
-          options={{
-              headerTitle: props => (
-                  <Fontisto style={{marginBottom: 10}} name="wallet" size={35} color="#a4c765" />
-              ),
-              headerTitleAlign: 'center',
-              headerStyle: {
-                  backgroundColor: '#2a2f20',  //#a4c765
-                  height: 120,
+  <ExpensesContextProvider>
+    <NavigationContainer>
+      <Stack.Navigator
+          screenOptions={{
+              headerShown: false,
+          contentStyle: {backgroundColor: "black"}}}>
 
-              },
-              contentStyle: {backgroundColor: "#2a2f20"}
-              // headerTitleContainerStyle: {
-              //     height: 120, // Adjust the height as per your requirement
-              // },
-              // headerTitleStyle: {
-              //     fontSize: 24, // Adjust the font size if needed
-              // },
-          }}
-      />
+          <Stack.Screen
+              name={"ExpensesOverview"}
+              component={ExpensesOverview}
+              options={{
+                  headerTitle: props => (
+                      <Fontisto style={{marginBottom: 10}} name="wallet" size={35} color="#a4c765" />
+                  ),
+                  headerTitleAlign: 'center',
+                  headerStyle: {
+                      backgroundColor: '#2a2f20',  //#a4c765
+                      height: 120,
 
-    <Stack.Screen
-        name={"ManageExpense"}
-        component={ManageExpense}
-        options={{
-            title: 'Manage Expense',
-            headerStyle: {backgroundColor: 'black'},
-            headerShown: true,
-            headerTintColor: "white",
-            contentStyle: {backgroundColor: "#1e1e1e"},
-            presentation: "modal",
-        }}
-    />
-    {/* this will be the default page, since its given to the first screen of bottom tab to display, it will be displayed by the first screen for both tab and stack*/}
+                  },
+                  contentStyle: {backgroundColor: "#2a2f20"}
+                  // headerTitleContainerStyle: {
+                  //     height: 120, // Adjust the height as per your requirement
+                  // },
+                  // headerTitleStyle: {
+                  //     fontSize: 24, // Adjust the font size if needed
+                  // },
+              }}
+          />
+
+        <Stack.Screen
+            name={"ManageExpense"}
+            component={ManageExpense}
+            options={{
+                title: 'Manage Expense',
+                headerStyle: {backgroundColor: 'black'},
+                headerShown: true,
+                headerTintColor: "white",
+                contentStyle: {backgroundColor: "#1e1e1e"},
+                presentation: "modal",
+            }}
+        />
+        {/* this will be the default page, since its given to the first screen of bottom tab to display, it will be displayed by the first screen for both tab and stack*/}
 
 
 
 
-  </Stack.Navigator>
-</NavigationContainer>
+      </Stack.Navigator>
+    </NavigationContainer>
+  </ExpensesContextProvider>
   );
 }
 

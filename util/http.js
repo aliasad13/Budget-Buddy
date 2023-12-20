@@ -1,6 +1,6 @@
 import axios from 'axios' ;
 
-const BACKEND_URL = 'http://192.168.20.3:3000/'
+const BACKEND_URL = 'http://192.168.20.4:3000/'
 
 
 //POST
@@ -65,7 +65,6 @@ export function deleteExpense(expenseId) {
 export async function fetchExpenses() {
     try {
         const response = await axios.get(BACKEND_URL + 'api/v1/expenses');
-        console.log("response data: " + JSON.stringify(response.data, null, 2))
 
         const expenses = [];
 
@@ -118,7 +117,6 @@ export async function fetchExpense(expenseId) {
 export async function fetchRecentExpenses() {
     try {
         const response = await axios.get(BACKEND_URL + 'api/v1/expenses/recent_expenses');
-        console.log("response data: " + JSON.stringify(response.data, null, 2))
 
         const expenses = [];
 

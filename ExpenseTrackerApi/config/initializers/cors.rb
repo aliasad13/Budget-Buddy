@@ -10,7 +10,7 @@ module YourRailsApp
 
     config.middleware.insert_before 0, Rack::Cors do
       allow do
-        origins '192.168.20.3:8081'
+        origins '192.168.20.4:8081'
         resource '*', headers: :any, methods: [:get, :post, :put, :patch, :delete, :options, :head], credentials: true
       end
     end

@@ -1,15 +1,18 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react';
+import React, {useContext, useEffect, useLayoutEffect, useState} from 'react';
 import {Button, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 // import {useRoute} from "@react-navigation/native";
 import {fetchExpenses, fetchExpense, storeExpense, updateExpense} from "../util/http";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DatePicker from "../util/datePicker";
+import {ExpensesContext} from "../store/expenses-context";
 
 
 
 
 
 function ManageExpense({route, navigation}) {
+    const expensesCtx = useContext(ExpensesContext);
+
 
     // const route = useRoute();
 
@@ -78,7 +81,11 @@ function ManageExpense({route, navigation}) {
                 alert('Amount is empty !!')
             } else if (expenseData.amount && expenseData.description) {
                 console.log('expenseData:', expenseData);
+
                 storeExpense(expenseData)
+                expensesCtx.addExpense(expenseData)
+                navigation.goBack();
+                console.log("storeExpense", expenseData)
                 //try calling fetchExpenses
             }
     }
@@ -92,6 +99,9 @@ function ManageExpense({route, navigation}) {
         } else if (expenseData.amount && expenseData.description) {
             console.log('expenseData:', expenseData);
             updateExpense(expenseId, expenseData)
+            expensesCtx.updateExpense(expenseId, expenseData)
+            navigation.goBack();
+
         }
 
 
@@ -135,6 +145,7 @@ function ManageExpense({route, navigation}) {
                                 Submit
                             </Text>
                         </TouchableOpacity>
+
                     </View>
                 </View>
             )}

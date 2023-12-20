@@ -3,9 +3,9 @@ import {FlatList, StyleSheet, Text, View} from "react-native";
 import {fetchExpenses} from "../util/http";
 import ExpensesList from "../components/ExpensesOutput/ExpensesList";
 
-function AllExpenses() {
+function AllExpenses({navigation}) {
   return(
-      <ExpensesList/>
+      <ExpensesList navigation={navigation}/>
   )
 
 }

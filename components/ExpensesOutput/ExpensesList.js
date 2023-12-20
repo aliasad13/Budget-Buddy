@@ -1,36 +1,16 @@
 import {ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 import ExpenseItem from './ExpenseItem';
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {deleteExpense, fetchExpenses} from "../../util/http";
 import {SwipeListView} from "react-native-swipe-list-view";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import WebSocketService from "../../util/WebSocketService";
+import {ExpensesContext} from "../../store/expenses-context";
 // import WebSocketService from "../../util/WebSocketService";
 
 
-function showConfirmation(id,description) {
-    console.log("name",description)
-    Alert.alert(
-        'Delete Item',
-        `${description}?`,
-        [
-            {
-                text: 'Cancel',
-                style: 'cancel',
-            },
-            {
-                text: 'OK',
-                onPress: () => {
-                    deleteExpense(id)
-                        .then(() => console.log(id, 'deleted successfully'))
-                        .catch(error => console.error('Error deleting expense:', error));
-                },
-            },
-        ],
-        {cancelable: false}
-    );
-}
+
 
 function renderExpenseItem(itemData) {
     return <ExpenseItem
@@ -43,16 +23,47 @@ function renderExpenseItem(itemData) {
 
 
 
-const renderHiddenItem = (rowdata, rowMap) => (
-    <View style={{ flex: 1, justifyContent: 'flex-end', flexDirection: 'row', zIndex: 0}}>
-        <TouchableOpacity onPress={() => showConfirmation(rowdata.item.id, rowdata.item.description)} style={[styles.expenseItem,{marginRight:15 }]}>
-            <Text style={{ color: 'white' }}><AntDesign name="delete" size={24} color="red" /></Text>
-        </TouchableOpacity>
-    </View>
-);
+
 
 function ExpensesList() {
+    const expensesCtx = useContext(ExpensesContext)
 
+    useEffect(() => {
+        console.log("ExpensesList re-rendered", expensesCtx.expenses);
+    }, [expensesCtx.expenses]);
+
+    function showConfirmation(id,description) {
+        Alert.alert(
+            'Delete Item',
+            `${description}?`,
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'OK',
+                    onPress: () => {
+                        deleteExpense(id)
+                            .then(() => {
+                                expensesCtx.deleteExpense(id)
+                                console.log("expensesCtx.expenses after delete -------------------------------",expensesCtx.expenses)
+                            })
+                            .catch(error => console.error('Error deleting expense:', error));
+                    },
+                },
+            ],
+            {cancelable: false}
+        );
+    }
+
+    const renderHiddenItem = (rowdata, rowMap) => (
+        <View style={{ flex: 1, justifyContent: 'flex-end', flexDirection: 'row', zIndex: 0}}>
+            <TouchableOpacity onPress={() => showConfirmation(rowdata.item.id, rowdata.item.description)} style={[styles.expenseItem,{marginRight:15 }]}>
+                <Text style={{ color: 'white' }}><AntDesign name="delete" size={24} color="red" /></Text>
+            </TouchableOpacity>
+        </View>
+    );
 
     const [expenses, setExpenses] = useState()
     useEffect(() => {
@@ -63,7 +74,9 @@ function ExpensesList() {
         async function getExpenses() {
             try {
                 const response = await fetchExpenses();
+
                 setExpenses(response); // Assuming that the response is an array of expenses
+                expensesCtx.setExpenses(response)
             } catch (error) {
                 console.error('Error fetching expenses:', error);
             }
@@ -73,12 +86,11 @@ function ExpensesList() {
         //     WebSocketService.off('notifications');
         // };
     }, []);
-    console.log("expenses: " + JSON.stringify(expenses, null, 2))
-
+        console.log("expensesCtx",expensesCtx.expenses)
     return (
         <View style={{backgroundColor: "#171717", zIndex: 10, flex: 1, paddingBottom: 85}}>
             <SwipeListView
-                data={expenses}
+                data={expensesCtx.expenses}
                 keyExtractor={(item) => item.id.toString()}
                 renderHiddenItem={renderHiddenItem}
                 rightOpenValue={-75}

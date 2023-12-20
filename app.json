@@ -14,7 +14,7 @@
     "packagerOpts": {
       "hostType": "lan",
       "lanType": "ip",
-      "lanIp": "192.168.20.3",
+      "lanIp": "192.168.20.4",
       "lanPort": 8081
     },
     "assetBundlePatterns": [

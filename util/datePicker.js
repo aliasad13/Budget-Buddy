@@ -7,8 +7,6 @@ import {Platform, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 
 
 function datePicker({onDateChange, initialDate}){
-    console.log("initialDate:", initialDate)
-    console.log("onDateChange:", onDateChange)
     const [date, setDate] = useState(new Date(initialDate));
     const [mode, setMode] = useState('date')
     // const [show, setShow] = useState(false)
