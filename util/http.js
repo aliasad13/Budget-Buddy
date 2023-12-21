@@ -5,55 +5,34 @@ const BACKEND_URL = 'http://192.168.20.4:3000/'
 
 //POST
 
-export function storeExpense(expenseData) {
-    axios.post(BACKEND_URL + 'api/v1/expenses', expenseData)
-        .then(response => {
-            // Handle success, e.g., show a message to the user
-            console.log('Expense stored successfully:', response.data);
-            alert('Food has been added successfully')
-        })
-        .catch(error => {
-            // Handle error, e.g., show an error message to the user
-            console.error('Error storing expense:', error);
-            alert('Error storing food')
-
-        });
-
+export async function storeExpense(expenseData) {
+    const response = await axios.post(BACKEND_URL + 'api/v1/expenses', expenseData)
+    console.log('Expense stored successfully:', response.data);
+    alert('Food has been stored successfully')
+    // using await will give us the response data even if its post, put or delete
 }
 
 // PUT
 
-export function updateExpense(expenseId, expenseData) {
-    axios.put(BACKEND_URL + `api/v1/expenses/${expenseId}`, expenseData)
-        .then(response => {
-            // Handle success, e.g., show a message to the user
-            console.log('Expense stored successfully:', response.data);
-            alert('Food has been updated successfully')
-        })
-        .catch(error => {
-            // Handle error, e.g., show an error message to the user
-            console.error('Error storing expense:', error);
-            alert('Error updating food')
-
-        });
-
+export async function updateExpense(expenseId, expenseData) {
+    const response =  await axios.put(BACKEND_URL + `api/v1/expenses/${expenseId}`, expenseData)
+    console.log('Expense updated successfully:', response.data);
+    alert('Food has been updated successfully')
 }
 
 
 // DELETE
 
-export function deleteExpense(expenseId) {
-    return axios.delete(BACKEND_URL + `api/v1/expenses/${expenseId}`)
-        .then(response => {
-            // Handle success, e.g., show a message to the user
-            console.log('Expense stored successfully:', response.data);
-            alert('Food has been deleted successfully')
-        })
-        .catch(error => {
-            // Handle error, e.g., show an error message to the user
-            console.error('Error deleting food:', error);
-            alert('Error deleting food')
-        });
+export async function deleteExpense(expenseId) {
+    try{
+    const response =  await axios.delete(BACKEND_URL + `api/v1/expenses/${expenseId}`)
+    console.log('Expense deleted successfully:', response.data);
+    alert('Food has been deleted successfully')
+    }
+    catch (error){
+        console.error('An error occurred while deleting:', error);
+        alert('An error occurred while deleting')
+    }
 }
 
 
@@ -166,5 +145,26 @@ myPromise.then(
     // Handle the rejected state (operation failed)
     console.error(error);
   }
+
+  instead of a pro,ise we can use await which gives us the response even if its a post request,
+
+ you typically cannot use .then directly with await in the same line. await is used within an async function to
+ pause execution until a Promise is settled (fulfilled or rejected). When you use await, you're effectively
+ saying, "Wait for this asynchronous operation to complete before moving on."
+
+
+  In summary, use await when you are working within an async function to pause execution until a
+  promise is settled. If you are not in an async function and want to handle the resolution or rejection
+  of a promise, you can use .then and .catch. Mixing await and .then on the same promise is redundant
+  and not recommended.
+  async function exampleAsyncFunction() {
+  try {
+    const result = await someAsyncOperation(); // Wait for the promise to settle
+    console.log(result); // This will only execute after the promise is settled
+  } catch (error) {
+    console.error('An error occurred:', error);
+  }
+}
+
 
 */

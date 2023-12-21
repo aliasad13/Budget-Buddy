@@ -5,6 +5,7 @@ import {fetchExpenses, fetchExpense, storeExpense, updateExpense} from "../util/
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DatePicker from "../util/datePicker";
 import {ExpensesContext} from "../store/expenses-context";
+import { Input, Icon } from 'react-native-elements';
 
 
 
@@ -73,7 +74,7 @@ function ManageExpense({route, navigation}) {
         date: formattedDate.toISOString()
     };
 
-    function submitHandlerStore( expenseData){
+    async function submitHandlerStore( expenseData){
 
             if (!expenseData.description) {
                 alert('Description is empty !!')
@@ -82,14 +83,18 @@ function ManageExpense({route, navigation}) {
             } else if (expenseData.amount && expenseData.description) {
                 console.log('expenseData:', expenseData);
 
-                storeExpense(expenseData)
+                try {
+                await storeExpense(expenseData)
                 expensesCtx.addExpense(expenseData)
                 navigation.goBack();
                 console.log("storeExpense", expenseData)
+                }catch (error){
+                    console.error(error)
+                }
                 //try calling fetchExpenses
             }
     }
-    function submitHandlerUpdate(expenseId, expenseData){
+    async function submitHandlerUpdate(expenseId, expenseData){
 
         console.log("expenseDataaaaaaaaaaaaaaaaaaaaaa", expenseData)
         if (!expenseData.description) {
@@ -98,9 +103,14 @@ function ManageExpense({route, navigation}) {
             alert('Amount is empty !!')
         } else if (expenseData.amount && expenseData.description) {
             console.log('expenseData:', expenseData);
-            updateExpense(expenseId, expenseData)
-            expensesCtx.updateExpense(expenseId, expenseData)
-            navigation.goBack();
+            try {
+                await updateExpense(expenseId, expenseData)
+                expensesCtx.updateExpense(expenseId, expenseData)
+                navigation.goBack();
+            }catch (error){
+                console.error(error)
+            }
+
 
         }
 
@@ -113,7 +123,7 @@ function ManageExpense({route, navigation}) {
         <View>
             {!isEditable && (
                 <View style={styles.inputView}>
-                    <TextInput style={styles.textInput} placeholder={"Description"} onChangeText={ text => setDescription(text)} />
+                    <TextInput maxLength={13} style={styles.textInput} placeholder={"Description"} onChangeText={ text => setDescription(text)} />
                     <TextInput style={styles.textInput} placeholder={"Amount"} onChangeText={ text => setAmount(text) } keyboardType={"number-pad"}/>
                     <View style={{marginVertical: 40}}>
                     <DatePicker onDateChange={handleDateChange} initialDate={formattedDate}/>
@@ -132,7 +142,7 @@ function ManageExpense({route, navigation}) {
 
             {isEditable &&(
                 <View style={styles.inputView}>
-                    <TextInput style={styles.textInput} placeholder={"Description"}  value={description} onChangeText={ text => setDescription(text)} />
+                    <TextInput maxLength={13} style={styles.textInput} placeholder={"Description"}  value={description} onChangeText={ text => setDescription(text)} />
                     <TextInput style={styles.textInput} placeholder={"Amount"}  value={amount.toString()} onChangeText={ text => setAmount(text) } keyboardType={"number-pad"}/>
                     <View style={{marginVertical: 40}}>
                         <DatePicker onDateChange={handleDateChange} initialDate={formattedDate}/>

@@ -1,4 +1,13 @@
-import {ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    RefreshControl,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from 'react-native';
 
 import ExpenseItem from './ExpenseItem';
 import {useContext, useEffect, useState} from "react";
@@ -27,6 +36,9 @@ function renderExpenseItem(itemData) {
 
 function ExpensesList() {
     const expensesCtx = useContext(ExpensesContext)
+    const [refreshing, setRefreshing] = useState(false);
+    const [expenses, setExpenses] = useState()
+
 
     useEffect(() => {
         console.log("ExpensesList re-rendered", expensesCtx.expenses);
@@ -65,7 +77,20 @@ function ExpensesList() {
         </View>
     );
 
-    const [expenses, setExpenses] = useState()
+    const onRefresh = async () => {
+        setRefreshing(true);
+
+        try {
+            const response = await fetchExpenses();
+            expensesCtx.setExpenses(response);
+        } catch (error) {
+            console.error('Error fetching expenses:', error);
+        } finally {  // regardless of the success or failure
+            setRefreshing(false);
+        }
+    };
+
+
     useEffect(() => {
         WebSocketService.on('notifications', (data) => {
             console.log('Received WebSocket notification:', data);
@@ -75,7 +100,7 @@ function ExpensesList() {
             try {
                 const response = await fetchExpenses();
 
-                setExpenses(response); // Assuming that the response is an array of expenses
+                // setExpenses(response); // Assuming that the response is an array of expenses
                 expensesCtx.setExpenses(response)
             } catch (error) {
                 console.error('Error fetching expenses:', error);
@@ -90,15 +115,28 @@ function ExpensesList() {
     return (
         <View style={{backgroundColor: "#171717", zIndex: 10, flex: 1, paddingBottom: 85}}>
             <SwipeListView
-                data={expensesCtx.expenses}
+                data={expensesCtx.expenses.reverse()}
                 keyExtractor={(item) => item.id.toString()}
                 renderHiddenItem={renderHiddenItem}
                 rightOpenValue={-75}
                 ItemSeparatorComponent={<View style={styles.separator}/> } // we can use itemSeparator to separate the items of the list with any style rather than just space
-                ListEmptyComponent={<View style={{top: 40}}><ActivityIndicator size={"large"} color={"red"} ></ActivityIndicator></View>}
+                ListEmptyComponent={
+                    refreshing ? <View style={{top: 40}}><ActivityIndicator size={"large"} color={"red"} ></ActivityIndicator></View> : ''}
                 renderItem={renderExpenseItem}
                 leftOpenValue={75}
                 disableRightSwipe={true}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={['red', 'green', 'blue']}
+                        tintColor={'red'}
+                        title="Pull to refresh"
+                        titleColor="#333"
+                        progressViewOffset={50}
+
+                    />
+                }
 
             />
         </View>
